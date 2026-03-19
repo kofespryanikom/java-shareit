@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @AllArgsConstructor
 public class ItemDto {
