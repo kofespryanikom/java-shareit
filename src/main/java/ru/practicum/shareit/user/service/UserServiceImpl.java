@@ -9,21 +9,30 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     public User createUser(UserDto userDto) {
-        if (userStorage.getUsersEmails().contains(userDto.getEmail())) {
+        if (userRepository.findAllEmails().contains(userDto.getEmail())) {
             log.warn("Пользователь с такой почтой {} уже существует", userDto.getEmail());
             throw new ConflictException("Пользователь с такой почтой " + userDto.getEmail() + " уже существует");
         }
-        return userStorage.createUser(userDto);
+
+        User userToSave = new User();
+        userToSave.setName(userDto.getName());
+        userToSave.setEmail(userDto.getEmail());
+
+        User savedUser = userRepository.save(userToSave);
+
+        log.info("Создан пользователь с id = {}", savedUser.getId());
+
+        return savedUser;
     }
 
     public User updateUser(Long userId, UserPatchDto userPatchDto) {
@@ -32,23 +41,43 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Поле name должно содержать символы отличные от пробелов");
         }
 
-        if (userStorage.getUsersEmails().contains(userPatchDto.getEmail())) {
+        if (userRepository.findAllEmails().contains(userPatchDto.getEmail())) {
             log.warn("Пользователь с такой почтой {} уже существует", userPatchDto.getEmail());
             throw new ConflictException("Пользователь с такой почтой " + userPatchDto.getEmail() + " уже существует");
         }
 
-        return userStorage.updateUser(userId, userPatchDto);
+        User user = getUserById(userId);
+        String email = userPatchDto.getEmail() == null ? user.getEmail() : userPatchDto.getEmail();
+        String name = userPatchDto.getName() == null ? user.getName() : userPatchDto.getName();
+
+        user.setEmail(email);
+        user.setName(name);
+
+        User userUpdated = userRepository.save(user);
+
+        log.info("Обновлен пользователь с id = {}", userId);
+
+        return userUpdated;
     }
 
     public User getUserById(Long userId) {
-        return userStorage.getUserById(userId);
+        return userRepository.findById(userId).orElseGet(() -> {
+            log.warn("Пользователь с id = {} не найден", userId);
+            throw new NotFoundException("Пользователь с id = " +
+                    userId + " не найден");
+        });
     }
 
     public void deleteUser(Long userId) {
-        if (!userStorage.getUsersIds().contains(userId)) {
-            log.warn("Пользователя с id = {} не существует", userId);
-            throw new NotFoundException("Пользователя с id = " + userId + " не существует");
-        }
-        userStorage.deleteUser(userId);
+        checkDoesUserExist(userId);
+        userRepository.deleteById(userId);
+    }
+
+    public void checkDoesUserExist(Long userId) {
+        userRepository.findById(userId).orElseGet(() -> {
+            log.warn("Пользователь с id = {} не найден", userId);
+            throw new NotFoundException("Пользователь с id = " +
+                userId + " не найден");
+        });
     }
 }

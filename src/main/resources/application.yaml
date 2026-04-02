@@ -10,3 +10,11 @@ spring:
     username: sa
     password: password
     driverClassName: org.postgresql.Driver
+  logging:
+    level:
+      org:
+        hibernate:
+          SQL: DEBUG
+          orm:
+            jdbc:
+              bind=trace:

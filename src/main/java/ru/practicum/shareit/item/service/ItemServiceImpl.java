@@ -11,7 +11,7 @@ import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +23,14 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+    private final UserServiceImpl userService;
 
     public Item createItem(Long userId, ItemDto itemDto) {
-        if (!userStorage.getUsersIds().contains(userId)) {
-            log.warn("Пользователя добавляющего вещь не существует!");
-            throw new NotFoundException("Пользователя добавляющего вещь не существует!");
-        }
+        userService.checkDoesUserExist(userId);
 
         Item item = ItemMapper.toItem(null, userId, itemDto);
 
-        return itemStorage.createItem(item);
+        return itemStorage.save(item);
     }
 
     public Item updateItem(Long itemId, Long userId, ItemPatchDto itemPatchDto) {
@@ -47,11 +44,26 @@ public class ItemServiceImpl implements ItemService {
             log.warn("Обновлять вещь может только владелец вещи");
             throw new NotFoundException("Обновлять вещь может только владелец вещи");
         }
-        return itemStorage.updateItem(itemId, itemPatchDto);
+
+        Item itemToUpdate = getItemById(itemId);
+        itemToUpdate.setAvailable(itemPatchDto.getAvailable() == null ? itemToUpdate.isAvailable()
+                : itemPatchDto.getAvailable());
+        itemToUpdate.setName(itemPatchDto.getName() == null ? itemToUpdate.getName() : itemPatchDto.getName());
+        itemToUpdate.setDescription(itemPatchDto.getDescription() == null ? itemToUpdate.getDescription()
+                : itemPatchDto.getDescription());
+
+        Item itemUpdated = itemStorage.save(itemToUpdate);
+
+        log.info("Обновлена вещь с id = {}", itemId);
+
+        return itemUpdated;
     }
 
     public Item getItemById(Long itemId) {
-        return itemStorage.getItemById(itemId);
+        return itemStorage.findById(itemId).orElseGet(() -> {
+            log.warn("Нет вещи с id = {}", itemId);
+            throw new NotFoundException("Вещи с id " + itemId + " нет!");
+        });
     }
 
     public List<Item> getItemsByUserId(Long userId) {
@@ -63,12 +75,6 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
-        List<Item> items = itemStorage.getAllItems();
-
-        return items.stream()
-                .filter(item -> (item.getName().toUpperCase().contains(text) ||
-                        item.getDescription().toUpperCase().contains(text)) &&
-                        item.isAvailable())
-                .toList();
+        return itemStorage.searchItems(text);
     }
 }
