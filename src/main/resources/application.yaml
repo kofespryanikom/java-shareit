@@ -1,0 +1,12 @@
+spring:
+  main:
+    log-startup-info: false
+    banner-mode: off
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:postgresql://localhost:5431/shares_db
+    username: sa
+    password: password
+    driverClassName: org.postgresql.Driver
