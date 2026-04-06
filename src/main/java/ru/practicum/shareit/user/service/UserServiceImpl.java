@@ -76,8 +76,7 @@ public class UserServiceImpl implements UserService {
     public void checkDoesUserExist(Long userId) {
         userRepository.findById(userId).orElseGet(() -> {
             log.warn("Пользователь с id = {} не найден", userId);
-            throw new NotFoundException("Пользователь с id = " +
-                userId + " не найден");
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         });
     }
 }
