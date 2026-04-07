@@ -1,2 +1,7 @@
 # java-shareit
-Template repository for Shareit project.
+![ER-diagram](ER-diagram.png)
+### Описанные таблицы
+- `users` — таблица пользователей
+- `bookings` — таблица бронирований предметов
+- `items` — таблица предметов
+- `comments` — таблица комментариев к предметам после бронирований
