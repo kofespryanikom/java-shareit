@@ -100,16 +100,23 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository
                         .findByBooker_IdAndStartBeforeAndEndAfterAndStatusOrderByStartDesc(userId, now, now,
                                 BookingStatus.APPROVED);
+                break;
             case PAST:
                 bookings = bookingRepository.findByBooker_IdAndEndBeforeAndStatusOrderByStartDesc(userId, now,
                         BookingStatus.APPROVED);
+                break;
             case FUTURE:
                 bookings = bookingRepository.findByBooker_IdAndStartAfterAndStatusOrderByStartDesc(userId, now,
                         BookingStatus.APPROVED);
+                break;
             case WAITING:
                 bookings = bookingRepository.findByBooker_IdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
                 bookings = bookingRepository.findByBooker_IdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                break;
+            default:
+                bookings = null;
         }
 
         return bookings;
@@ -131,18 +138,25 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository
                         .findByItem_Owner_IdAndStartBeforeAndEndAfterAndStatusOrderByStartDesc(ownerId, now, now,
                                 BookingStatus.APPROVED);
+                break;
             case PAST:
                 bookings = bookingRepository.findByItem_Owner_IdAndEndBeforeAndStatusOrderByStartDesc(ownerId, now,
                         BookingStatus.APPROVED);
+                break;
             case FUTURE:
                 bookings = bookingRepository.findByItem_Owner_IdAndStartAfterAndStatusOrderByStartDesc(ownerId, now,
                         BookingStatus.APPROVED);
+                break;
             case WAITING:
                 bookings = bookingRepository
                         .findByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, BookingStatus.WAITING);
+                break;
             case REJECTED:
                 bookings = bookingRepository
                         .findByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED);
+                break;
+            default:
+                bookings = null;
         }
 
         return bookings;
