@@ -3,8 +3,7 @@ package ru.practicum.shareit.item.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -16,31 +15,29 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
-    private static final String currentUserHeader = "X-Sharer-User-Id";
 
     @PostMapping
     public Item createItem(@Valid @RequestBody ItemDto itemDto,
-                           @RequestHeader(currentUserHeader)
-                           Long owner) {
+                           @RequestHeader("X-Sharer-User-Id") Long owner) {
         return itemService.createItem(owner, itemDto);
     }
 
     @PatchMapping("/{itemId}")
     public Item updateItem(@Valid @RequestBody ItemPatchDto itemPatchDto,
                            @PathVariable Long itemId,
-                           @RequestHeader(currentUserHeader)
+                           @RequestHeader("X-Sharer-User-Id")
                            Long userId) {
         return itemService.updateItem(itemId, userId, itemPatchDto);
     }
 
     @GetMapping("/{itemId}")
-    public Item getItemById(@PathVariable Long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemDtoWithBookingDates getItemById(@PathVariable Long itemId) {
+        return itemService.findItemWithBookingDatesAndCommentsByItemId(itemId);
     }
 
     @GetMapping
-    public List<Item> getItemsByUserId(@RequestHeader(currentUserHeader) Long owner) {
-        return itemService.getItemsByUserId(owner);
+    public List<ItemDtoWithBookingDates> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long owner) {
+        return itemService.findItemsByOwner(owner);
     }
 
     @GetMapping("/search")
@@ -48,4 +45,10 @@ public class ItemController {
         return itemService.searchItemsByName(text);
     }
 
+    @PostMapping("/{itemId}/comment")
+    public CommentOutDto createComment(@RequestHeader("X-Sharer-User-Id") Long owner,
+                                       @PathVariable Long itemId,
+                                       @Valid @RequestBody CommentDto commentDto) {
+        return itemService.createComment(owner, itemId, commentDto);
+    }
 }

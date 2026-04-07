@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +17,5 @@ public class ItemDto {
 
     @NotNull(message = "поле available должно быть задано")
     private Boolean available;
-    private ItemRequest request;
+    private Long request;
 }
