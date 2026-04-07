@@ -7,8 +7,8 @@ spring:
       mode: always
   datasource:
     url: jdbc:postgresql://localhost:5432/shares_db
-    username: sa
-    password: password
+    username: dbuser
+    password: 12345
     driverClassName: org.postgresql.Driver
 logging:
   level:
