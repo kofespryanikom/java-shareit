@@ -10,8 +10,6 @@ spring:
     username: dbuser
     password: 12345
     driverClassName: org.postgresql.Driver
-  profiles:
-    active: docker
 logging:
   level:
     org:

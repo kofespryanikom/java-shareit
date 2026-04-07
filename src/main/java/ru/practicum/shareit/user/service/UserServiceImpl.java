@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -14,10 +15,12 @@ import ru.practicum.shareit.user.storage.UserRepository;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public User createUser(UserDto userDto) {
         if (userRepository.findAllEmails().contains(userDto.getEmail())) {
             log.warn("Пользователь с такой почтой {} уже существует", userDto.getEmail());
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService {
         return savedUser;
     }
 
+    @Transactional
     public User updateUser(Long userId, UserPatchDto userPatchDto) {
         if (userPatchDto.getName() != null && userPatchDto.getName().isBlank()) {
             log.warn("Поле name должно содержать символы отличные от пробелов");
@@ -68,6 +72,7 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    @Transactional
     public void deleteUser(Long userId) {
         checkDoesUserExist(userId);
         userRepository.deleteById(userId);

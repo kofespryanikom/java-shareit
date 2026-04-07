@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Validated
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -36,6 +38,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
+    @Transactional
     public Item createItem(Long userId, ItemDto itemDto) {
         userService.checkDoesUserExist(userId);
 
@@ -44,6 +47,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.save(item);
     }
 
+    @Transactional
     public Item updateItem(Long itemId, Long userId, ItemPatchDto itemPatchDto) {
         if (itemPatchDto.getName() != null && itemPatchDto.getName().isBlank() ||
                 itemPatchDto.getDescription() != null && itemPatchDto.getDescription().isBlank()) {
@@ -182,6 +186,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
+    @Transactional
     public CommentOutDto createComment(Long owner, Long itemId, CommentDto commentDto) {
         List<Booking> bookingsCompletedByBooker = bookingRepository.findByBooker_IdAndEndBeforeAndStatusOrderByStartDesc(owner, LocalDateTime.now(),
                 BookingStatus.APPROVED);
