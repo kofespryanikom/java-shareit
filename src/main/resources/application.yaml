@@ -6,10 +6,10 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5432/shares_db
-    username: dbuser
-    password: 12345
-    driverClassName: org.postgresql.Driver
+    url: jdbc:h2:file:./db/filmorate
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
 logging:
   level:
     org:
