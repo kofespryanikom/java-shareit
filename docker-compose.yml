@@ -15,16 +15,3 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
-  server:
-    build: .
-    image: shareit-server
-    container_name: shareit-server
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shares_db
-      - SPRING_DATASOURCE_USERNAME=dbuser
-      - SPRING_DATASOURCE_PASSWORD=12345
