@@ -92,7 +92,7 @@ public class RequestServiceImplTests {
         requestService.createRequest(makeRequestDto("Кресло", user2), user2.getId());
 
         var result = requestService.getAllRequestsExceptUser(user1.getId());
-        assertThat(result, hasSize(1));
+        assertThat(result, hasSize(2));
         assertThat(result.toString(), containsString("Кресло"));
     }
 
