@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.model.BookingState;
 
 
 @RestController
@@ -24,11 +23,9 @@ public class BookingController {
     public ResponseEntity<Object> findUsersBookings(@RequestParam(defaultValue = "all") String state,
                                                     @Positive(message = "id пользователя должен быть положительным")
                                                     @RequestHeader(USER_ID_HEADER) Long userId) {
-        BookingState bookingState = BookingState.from(state)
-                .orElseThrow(() -> new IllegalArgumentException("Неизвестное состояние бронирования: " + state));
 
         log.info("Get запрос на получение бронирований пользователя userId = {} с bookingState = {}", userId, state);
-        return bookingClient.findUsersBookings(userId, bookingState);
+        return bookingClient.findUsersBookings(userId, state);
     }
 
     @PostMapping
@@ -62,10 +59,8 @@ public class BookingController {
                                                                      @Positive(message = "id пользователя должен " +
                                                                              "быть положительным")
                                                                      @RequestHeader(USER_ID_HEADER) Long ownerId) {
-        BookingState bookingState = BookingState.from(state)
-                .orElseThrow(() -> new IllegalArgumentException("Неизвестное состояние бронирования: " + state));
 
         log.info("Get запрос на получение бронирований вещей владельца по ownerId = {}", ownerId);
-        return bookingClient.findBookingsOfOwnersItemsByOwnerId(bookingState, ownerId);
+        return bookingClient.findBookingsOfOwnersItemsByOwnerId(state, ownerId);
     }
 }

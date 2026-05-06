@@ -90,8 +90,10 @@ public class BookingServiceImpl implements BookingService {
 
     public List<Booking> findUsersBookings(String state, Long userId) {
         userService.checkDoesUserExist(userId);
+        BookingState.from(state)
+                .orElseThrow(() -> new IllegalArgumentException("Неизвестное состояние бронирования: " + state));
 
-        if (state.equals("ALL")) {
+        if (state.equalsIgnoreCase("ALL")) {
             return bookingRepository.findByBooker_IdOrderByStartDesc(userId);
         }
 
@@ -128,8 +130,10 @@ public class BookingServiceImpl implements BookingService {
 
     public List<Booking> findBookingsOfOwnersItemsByOwnerId(String state, Long ownerId) {
         userService.checkDoesUserExist(ownerId);
+        BookingState.from(state)
+                .orElseThrow(() -> new IllegalArgumentException("Неизвестное состояние бронирования: " + state));
 
-        if (state.equals("ALL")) {
+        if (state.equalsIgnoreCase("ALL")) {
             return bookingRepository.findByItem_Owner_IdOrderByStartDesc(ownerId);
         }
 
